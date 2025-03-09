@@ -9,7 +9,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, "public"))); // Serve static files
+app.use(express.static(path.resolve(__dirname))); // Serve static files from root
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGO_URI;
@@ -31,7 +31,7 @@ const Record = mongoose.model("Record", recordSchema);
 
 // Serve HTML Page
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "public", "index.html"));
+  res.sendFile(path.resolve(__dirname, "index.html"));
 });
 
 // API to Add Record
@@ -89,5 +89,5 @@ app.delete("/deleteRecord/:id", async (req, res) => {
   }
 });
 
-// Export app for Vercel (REMOVED `app.listen`)
+// Export app for Vercel
 module.exports = app;
