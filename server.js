@@ -5,29 +5,18 @@ const path = require("path");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, "public"))); // Serve static files
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, "public")));
-
-// MongoDB Connection
+// Connect to MongoDB
 const mongoURI = process.env.MONGO_URI;
-if (!mongoURI) {
-  console.error("❌ MONGO_URI is missing in environment variables");
-  process.exit(1);
-}
-
 mongoose
   .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-    process.exit(1);
-  });
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
 // Define Schema and Model
 const recordSchema = new mongoose.Schema({
@@ -42,7 +31,7 @@ const Record = mongoose.model("Record", recordSchema);
 
 // Serve HTML Page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.resolve(__dirname, "public", "index.html"));
 });
 
 // API to Add Record
@@ -100,10 +89,5 @@ app.delete("/deleteRecord/:id", async (req, res) => {
   }
 });
 
-// Handle unknown routes to serve frontend
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// Start Server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Export app for Vercel (REMOVED `app.listen`)
+module.exports = app;
