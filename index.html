@@ -4,165 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Environment_Status</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: white;
-                transition: background-color 0.3s ease-in-out;
-            }
-
-            header {
-                background-color: red;
-                color: white;
-                text-align: center;
-                padding: 15px;
-                font-size: 24px;
-                font-weight: bold;
-            }
-
-            main {
-                padding: 20px;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 20px;
-                max-width: 1200px; /* Prevents excessive expansion */
-                margin: 0 auto; /* Centers content */
-            }
-
-            .table-section {
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 1200px; /* Restricts table expansion */
-                transition: transform 0.3s ease-in-out;
-            }
-
-            .table-section:hover {
-                transform: scale(1.02);
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            table,
-            th,
-            td {
-                border: 1px solid #ddd;
-            }
-
-            th,
-            td {
-                padding: 10px;
-                text-align: center;
-                white-space: nowrap;
-            }
-
-            th {
-                background: red;
-                color: white;
-            }
-
-            .actions button {
-                margin-right: 5px;
-                padding: 5px;
-                border: none;
-                cursor: pointer;
-                border-radius: 3px;
-                transition: background 0.3s;
-            }
-
-            .edit-btn {
-                background: orange;
-                color: white;
-            }
-
-            .edit-btn:hover {
-                background: darkorange;
-            }
-
-            .delete-btn {
-                background: crimson;
-                color: white;
-            }
-
-            .delete-btn:hover {
-                background: darkred;
-            }
-
-            /* Responsive Design */
-
-            /* Tablets (max-width: 1024px) */
-            @media (max-width: 1920px) {
-                .table-section {
-                    max-width: 80%;
-                }
-            }
-
-            /* Mobile Devices (max-width: 768px) */
-            @media (max-width: 768px) {
-                main {
-                    flex-direction: column; /* Stack tables on small screens */
-                    align-items: center;
-                    padding: 10px;
-                }
-
-                .table-section {
-                    width: 100%;
-                    max-width: 100%;
-                    padding: 15px;
-                }
-
-                th,
-                td {
-                    padding: 8px;
-                    font-size: 14px; /* Reduce text size for better fit */
-                }
-
-                .actions button {
-                    padding: 5px 8px;
-                    font-size: 12px; /* Smaller buttons for smaller screens */
-                }
-            }
-
-            /* Small Mobile Screens (max-width: 480px) */
-            @media (max-width: 480px) {
-                header {
-                    font-size: 20px; /* Reduce header size */
-                    padding: 10px;
-                }
-
-                th,
-                td {
-                    padding: 6px;
-                    font-size: 12px;
-                }
-
-                .actions button {
-                    padding: 4px 6px;
-                    font-size: 10px;
-                }
-
-                /* Enable horizontal scrolling for very small screens */
-                .table-section {
-                    overflow-x: auto;
-                }
-
-                table {
-                    display: block;
-                    width: 100%;
-                    overflow-x: auto;
-                    white-space: nowrap;
-                }
-            }
-        </style>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     </head>
 
     <body>
@@ -174,30 +16,10 @@
             <section class="table-section">
                 <h2>Frontend Table</h2>
                 <form onsubmit="submitRecord(event, 'frontend')">
-                    <input
-                        type="text"
-                        id="frontendEnv"
-                        placeholder="Environment"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="frontendBuild"
-                        placeholder="Build"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="frontendDev"
-                        placeholder="Developer"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="frontendQA"
-                        placeholder="QA"
-                        required
-                    />
+                    <input type="text" id="frontendEnv" placeholder="Environment" required />
+                    <input type="text" id="frontendBuild" placeholder="Build" required />
+                    <input type="text" id="frontendDev" placeholder="Developer" required />
+                    <input type="text" id="frontendQA" placeholder="QA" required />
                     <button type="submit">Add Row</button>
                 </form>
                 <table id="frontendTable">
@@ -218,30 +40,10 @@
             <section class="table-section">
                 <h2>Backend Table</h2>
                 <form onsubmit="submitRecord(event, 'backend')">
-                    <input
-                        type="text"
-                        id="backendEnv"
-                        placeholder="Environment"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="backendBuild"
-                        placeholder="Build"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="backendDev"
-                        placeholder="Developer"
-                        required
-                    />
-                    <input
-                        type="text"
-                        id="backendQA"
-                        placeholder="QA"
-                        required
-                    />
+                    <input type="text" id="backendEnv" placeholder="Environment" required />
+                    <input type="text" id="backendBuild" placeholder="Build" required />
+                    <input type="text" id="backendDev" placeholder="Developer" required />
+                    <input type="text" id="backendQA" placeholder="QA" required />
                     <button type="submit">Add Row</button>
                 </form>
                 <table id="backendTable">
@@ -261,32 +63,38 @@
         </main>
 
         <script>
+            const socket = io(); // Connect to WebSocket server
+
             async function fetchRecords() {
                 const response = await fetch("/getRecords");
                 const records = await response.json();
+                updateUI(records);
+            }
 
-                document.querySelector("#frontendTable tbody").innerHTML = "";
-                document.querySelector("#backendTable tbody").innerHTML = "";
+            function updateUI(records) {
+                const frontendTable = document.querySelector("#frontendTable tbody");
+                const backendTable = document.querySelector("#backendTable tbody");
+                frontendTable.innerHTML = "";
+                backendTable.innerHTML = "";
 
-                let frontendCount = 1,
-                    backendCount = 1;
+                let frontendCount = 1, backendCount = 1;
 
-                records.forEach((record) => {
-                    const table = document.querySelector(
-                        `#${record.type}Table tbody`,
-                    );
-                    const row = table.insertRow();
+                records.forEach(record => {
+                    const table = document.querySelector(`#${record.type}Table tbody`);
+                    const row = document.createElement("tr");
+                    row.id = record._id;
                     row.innerHTML = `
-                    <td>${record.type === "frontend" ? frontendCount++ : backendCount++}</td>
-                    <td><span>${record.environment}</span></td>
-                    <td><span>${record.build}</span></td>
-                    <td><span>${record.developer}</span></td>
-                    <td><span>${record.qa}</span></td>
-                    <td>
-                        <button class='edit-btn' onclick='editRow(this, "${record._id}")'>Edit</button>
-                        <button class='delete-btn' onclick='deleteRecord("${record._id}")'>Delete</button>
-                    </td>
-                `;
+                        <td>${record.type === "frontend" ? frontendCount++ : backendCount++}</td>
+                        <td><span>${record.environment}</span></td>
+                        <td><span>${record.build}</span></td>
+                        <td><span>${record.developer}</span></td>
+                        <td><span>${record.qa}</span></td>
+                        <td>
+                            <button class='edit-btn' onclick='editRow(this, "${record._id}")'>Edit</button>
+                            <button class='delete-btn' onclick='deleteRecord("${record._id}")'>Delete</button>
+                        </td>
+                    `;
+                    table.appendChild(row);
                 });
             }
 
@@ -300,81 +108,54 @@
                 await fetch("/addRecord", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        type,
-                        environment: env,
-                        build,
-                        developer: dev,
-                        qa,
-                    }),
+                    body: JSON.stringify({ type, environment: env, build, developer: dev, qa }),
                 });
 
-                fetchRecords();
                 event.target.reset();
             }
 
             async function editRow(button, id) {
-                const row = button.closest("tr"); // Get the parent row
-                const cells = row.querySelectorAll(
-                    "td:not(:first-child):not(:last-child)",
-                ); // Select editable cells
+                const row = button.closest("tr");
+                const cells = row.querySelectorAll("td:not(:first-child):not(:last-child)");
 
                 if (button.textContent === "Edit") {
-                    // Convert text to input fields
-                    cells.forEach((cell) => {
+                    cells.forEach(cell => {
                         const span = cell.querySelector("span");
                         if (span) {
                             const input = document.createElement("input");
                             input.type = "text";
                             input.value = span.textContent;
-                            cell.innerHTML = ""; // Clear cell
+                            cell.innerHTML = "";
                             cell.appendChild(input);
                         }
                     });
 
-                    button.textContent = "Save"; // Change button text to "Save"
+                    button.textContent = "Save";
                 } else {
-                    const confirmEdit = confirm(
-                        "Are you sure you want to save changes?",
-                    );
+                    const confirmEdit = confirm("Are you sure you want to save changes?");
                     if (confirmEdit) {
                         const updatedData = {
-                            environment:
-                                row.cells[1].querySelector("input").value,
+                            environment: row.cells[1].querySelector("input").value,
                             build: row.cells[2].querySelector("input").value,
-                            developer:
-                                row.cells[3].querySelector("input").value,
+                            developer: row.cells[3].querySelector("input").value,
                             qa: row.cells[4].querySelector("input").value,
                         };
 
-                        try {
-                            const response = await fetch(
-                                `/updateRecord/${id}`,
-                                {
-                                    method: "PUT",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify(updatedData),
-                                },
-                            );
+                        await fetch(`/updateRecord/${id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(updatedData),
+                        });
 
-                            if (!response.ok)
-                                throw new Error("Failed to update record");
+                        cells.forEach((cell, index) => {
+                            const input = cell.querySelector("input");
+                            if (input) {
+                                cell.innerHTML = `<span>${input.value}</span>`;
+                            }
+                        });
 
-                            // Replace inputs with spans after successful update
-                            cells.forEach((cell, index) => {
-                                const input = cell.querySelector("input");
-                                if (input) {
-                                    cell.innerHTML = `<span>${input.value}</span>`;
-                                }
-                            });
-
-                            button.textContent = "Edit"; // Change button text back to "Edit"
-                            alert("✅ Changes saved successfully!");
-                        } catch (error) {
-                            alert("❌ Error updating record: " + error.message);
-                        }
+                        button.textContent = "Edit";
+                        alert("✅ Changes saved successfully!");
                     } else {
                         alert("Edit cancelled.");
                     }
@@ -384,9 +165,48 @@
             async function deleteRecord(id) {
                 if (confirm("Are you sure you want to delete this record?")) {
                     await fetch(`/deleteRecord/${id}`, { method: "DELETE" });
-                    fetchRecords();
                 }
             }
+
+            // Listen for real-time updates
+            socket.on("recordUpdated", (data) => {
+                console.log("🔄 Real-time update received:", data);
+
+                if (data.action === "add") {
+                    const table = document.querySelector(`#${data.record.type}Table tbody`);
+                    const row = document.createElement("tr");
+                    row.id = data.record._id;
+                    row.innerHTML = `
+                        <td>New</td>
+                        <td><span>${data.record.environment}</span></td>
+                        <td><span>${data.record.build}</span></td>
+                        <td><span>${data.record.developer}</span></td>
+                        <td><span>${data.record.qa}</span></td>
+                        <td>
+                            <button class='edit-btn' onclick='editRow(this, "${data.record._id}")'>Edit</button>
+                            <button class='delete-btn' onclick='deleteRecord("${data.record._id}")'>Delete</button>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                }
+
+                if (data.action === "update") {
+                    const row = document.getElementById(data.record._id);
+                    if (row) {
+                        row.cells[1].innerHTML = `<span>${data.record.environment}</span>`;
+                        row.cells[2].innerHTML = `<span>${data.record.build}</span>`;
+                        row.cells[3].innerHTML = `<span>${data.record.developer}</span>`;
+                        row.cells[4].innerHTML = `<span>${data.record.qa}</span>`;
+                    }
+                }
+
+                if (data.action === "delete") {
+                    const row = document.getElementById(data.recordId);
+                    if (row) {
+                        row.remove();
+                    }
+                }
+            });
 
             window.onload = fetchRecords;
         </script>
