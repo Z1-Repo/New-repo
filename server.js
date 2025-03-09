@@ -9,14 +9,14 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname))); // Serve static files from root
+app.use(express.static(__dirname)); // Serve static files from root directory
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGO_URI;
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+db.on("error", (err) => console.error("❌ MongoDB Connection Error:", err));
+db.once("open", () => console.log("✅ Connected to MongoDB"));
 
 // Define Schema and Model
 const recordSchema = new mongoose.Schema({
@@ -31,7 +31,7 @@ const Record = mongoose.model("Record", recordSchema);
 
 // Serve HTML Page
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // API to Add Record
@@ -82,7 +82,10 @@ app.get("/getRecords", async (req, res) => {
 // API to Delete Record
 app.delete("/deleteRecord/:id", async (req, res) => {
   try {
-    await Record.findByIdAndDelete(req.params.id);
+    const deletedRecord = await Record.findByIdAndDelete(req.params.id);
+    if (!deletedRecord) {
+      return res.status(404).json({ error: "Record not found" });
+    }
     res.json({ message: "✅ Record deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
