@@ -11,9 +11,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve static files from root directory
 
-// Connect to MongoDB
+// Connect to MongoDB with connection pooling
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10, // Limit concurrent connections
+});
+
 const db = mongoose.connection;
 db.on("error", (err) => console.error("❌ MongoDB Connection Error:", err));
 db.once("open", () => console.log("✅ Connected to MongoDB"));
@@ -90,6 +95,14 @@ app.delete("/deleteRecord/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// Graceful Shutdown - Close MongoDB Connection on Exit
+process.on("SIGINT", async () => {
+  console.log("🛑 Shutting down...");
+  await mongoose.connection.close();
+  console.log("✅ MongoDB connection closed");
+  process.exit(0);
 });
 
 // Export app for Vercel
