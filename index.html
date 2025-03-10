@@ -293,41 +293,51 @@ async function submitRecord(event, type) {
 
 // Edit and update a record
 async function editRow(button, id) {
-    const row = button.closest("tr");
-    const cells = row.querySelectorAll("td:not(:first-child):not(:last-child)");
+                const row = button.closest("tr");
+                const cells = row.querySelectorAll("td:not(:first-child):not(:last-child)");
 
-    if (button.textContent === "Edit") {
-        cells.forEach((cell) => {
-            const span = cell.querySelector("span");
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = span.textContent;
-            cell.innerHTML = "";
-            cell.appendChild(input);
-        });
-        button.textContent = "Save";
-    } else {
-        const confirmEdit = confirm("Save changes?");
-        if (!confirmEdit) return;
+                if (button.textContent === "Edit") {
+                    cells.forEach(cell => {
+                        const span = cell.querySelector("span");
+                        if (span) {
+                            const input = document.createElement("input");
+                            input.type = "text";
+                            input.value = span.textContent;
+                            cell.innerHTML = "";
+                            cell.appendChild(input);
+                        }
+                    });
 
-        const updatedData = {
-            environment: cells[0].querySelector("input").value,
-            build: cells[1].querySelector("input").value,
-            developer: cells[2].querySelector("input").value,
-            qa: cells[3].querySelector("input").value,
-        };
+                    button.textContent = "Save";
+                } else {
+                    const confirmEdit = confirm("Are you sure you want to save changes?");
+                    if (confirmEdit) {
+                        const updatedData = {
+                            environment: row.cells[1].querySelector("input").value,
+                            build: row.cells[2].querySelector("input").value,
+                            developer: row.cells[3].querySelector("input").value,
+                            qa: row.cells[4].querySelector("input").value,
+                        };
 
-        try {
-            await fetch(`/updateRecord/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedData),
-            });
-            fetchRecords(); // Refresh after edit
-        } catch (error) {
-            console.error("Error updating record:", error);
-        }
-    }
+                        await fetch(`/updateRecord/${id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(updatedData),
+                        });
+
+                        cells.forEach((cell, index) => {
+                            const input = cell.querySelector("input");
+                            if (input) {
+                                cell.innerHTML = `<span>${input.value}</span>`;
+                            }
+                        });
+
+                        button.textContent = "Edit";
+                        alert("✅ Changes saved successfully!");
+                    } else {
+                        alert("Edit cancelled.");
+                    }
+                }
 }
 
 // Delete a record
