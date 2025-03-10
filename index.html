@@ -225,150 +225,131 @@
         <script>
             const socket = io(); // Connect to WebSocket server
 
-            async function fetchRecords() {
-                const response = await fetch("/getRecords");
-                const records = await response.json();
-                updateUI(records);
-            }
+// Fetch and refresh the table on page load
+async function fetchRecords() {
+    try {
+        const response = await fetch("/getRecords");
+        const records = await response.json();
+        updateUI(records);
+    } catch (error) {
+        console.error("Error fetching records:", error);
+    }
+}
 
-            function updateUI(records) {
-                const frontendTable = document.querySelector("#frontendTable tbody");
-                const backendTable = document.querySelector("#backendTable tbody");
-                frontendTable.innerHTML = "";
-                backendTable.innerHTML = "";
+// Populate records in the UI
+function updateUI(records) {
+    const frontendTable = document.querySelector("#frontendTable tbody");
+    const backendTable = document.querySelector("#backendTable tbody");
+    frontendTable.innerHTML = "";
+    backendTable.innerHTML = "";
 
-                let frontendCount = 1, backendCount = 1;
+    let frontendCount = 1, backendCount = 1;
 
-                records.forEach(record => {
-                    const table = document.querySelector(`#${record.type}Table tbody`);
-                    const row = document.createElement("tr");
-                    row.id = record._id;
-                    row.innerHTML = `
-                        <td>${record.type === "frontend" ? frontendCount++ : backendCount++}</td>
-                        <td><span>${record.environment}</span></td>
-                        <td><span>${record.build}</span></td>
-                        <td><span>${record.developer}</span></td>
-                        <td><span>${record.qa}</span></td>
-                        <td>
-                            <button class='edit-btn' onclick='editRow(this, "${record._id}")'>Edit</button>
-                            <button class='delete-btn' onclick='deleteRecord("${record._id}")'>Delete</button>
-                        </td>
-                    `;
-                    table.appendChild(row);
-                });
-            }
+    records.forEach((record) => {
+        const table = record.type === "frontend" ? frontendTable : backendTable;
+        const count = record.type === "frontend" ? frontendCount++ : backendCount++;
+        appendRow(table, record, count);
+    });
+}
 
-            async function submitRecord(event, type) {
-                event.preventDefault();
-                const env = document.getElementById(`${type}Env`).value;
-                const build = document.getElementById(`${type}Build`).value;
-                const dev = document.getElementById(`${type}Dev`).value;
-                const qa = document.getElementById(`${type}QA`).value;
+// Add a new row to the table
+function appendRow(table, record, count) {
+    const row = document.createElement("tr");
+    row.id = record._id;
+    row.innerHTML = `
+        <td>${count}</td>
+        <td><span>${record.environment}</span></td>
+        <td><span>${record.build}</span></td>
+        <td><span>${record.developer}</span></td>
+        <td><span>${record.qa}</span></td>
+        <td>
+            <button class='edit-btn' onclick='editRow(this, "${record._id}")'>Edit</button>
+            <button class='delete-btn' onclick='deleteRecord("${record._id}")'>Delete</button>
+        </td>
+    `;
+    table.appendChild(row);
+}
 
-                await fetch("/addRecord", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ type, environment: env, build, developer: dev, qa }),
-                });
+// Handle form submission
+async function submitRecord(event, type) {
+    event.preventDefault();
+    const env = document.getElementById(`${type}Env`).value;
+    const build = document.getElementById(`${type}Build`).value;
+    const dev = document.getElementById(`${type}Dev`).value;
+    const qa = document.getElementById(`${type}QA`).value;
 
-                event.target.reset();
-            }
+    try {
+        await fetch("/addRecord", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type, environment: env, build, developer: dev, qa }),
+        });
+        event.target.reset();
+    } catch (error) {
+        console.error("Error submitting record:", error);
+    }
+}
 
-            async function editRow(button, id) {
-                const row = button.closest("tr");
-                const cells = row.querySelectorAll("td:not(:first-child):not(:last-child)");
+// Edit and update a record
+async function editRow(button, id) {
+    const row = button.closest("tr");
+    const cells = row.querySelectorAll("td:not(:first-child):not(:last-child)");
 
-                if (button.textContent === "Edit") {
-                    cells.forEach(cell => {
-                        const span = cell.querySelector("span");
-                        if (span) {
-                            const input = document.createElement("input");
-                            input.type = "text";
-                            input.value = span.textContent;
-                            cell.innerHTML = "";
-                            cell.appendChild(input);
-                        }
-                    });
+    if (button.textContent === "Edit") {
+        cells.forEach((cell) => {
+            const span = cell.querySelector("span");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = span.textContent;
+            cell.innerHTML = "";
+            cell.appendChild(input);
+        });
+        button.textContent = "Save";
+    } else {
+        const confirmEdit = confirm("Save changes?");
+        if (!confirmEdit) return;
 
-                    button.textContent = "Save";
-                } else {
-                    const confirmEdit = confirm("Are you sure you want to save changes?");
-                    if (confirmEdit) {
-                        const updatedData = {
-                            environment: row.cells[1].querySelector("input").value,
-                            build: row.cells[2].querySelector("input").value,
-                            developer: row.cells[3].querySelector("input").value,
-                            qa: row.cells[4].querySelector("input").value,
-                        };
+        const updatedData = {
+            environment: cells[0].querySelector("input").value,
+            build: cells[1].querySelector("input").value,
+            developer: cells[2].querySelector("input").value,
+            qa: cells[3].querySelector("input").value,
+        };
 
-                        await fetch(`/updateRecord/${id}`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(updatedData),
-                        });
-
-                        cells.forEach((cell, index) => {
-                            const input = cell.querySelector("input");
-                            if (input) {
-                                cell.innerHTML = `<span>${input.value}</span>`;
-                            }
-                        });
-
-                        button.textContent = "Edit";
-                        alert("✅ Changes saved successfully!");
-                    } else {
-                        alert("Edit cancelled.");
-                    }
-                }
-            }
-
-            async function deleteRecord(id) {
-                if (confirm("Are you sure you want to delete this record?")) {
-                    await fetch(`/deleteRecord/${id}`, { method: "DELETE" });
-                }
-            }
-
-            // Listen for real-time updates
-            socket.on("recordUpdated", (data) => {
-                console.log("🔄 Real-time update received:", data);
-
-                if (data.action === "add") {
-                    const table = document.querySelector(`#${data.record.type}Table tbody`);
-                    const row = document.createElement("tr");
-                    row.id = data.record._id;
-                    row.innerHTML = `
-                        <td>New</td>
-                        <td><span>${data.record.environment}</span></td>
-                        <td><span>${data.record.build}</span></td>
-                        <td><span>${data.record.developer}</span></td>
-                        <td><span>${data.record.qa}</span></td>
-                        <td>
-                            <button class='edit-btn' onclick='editRow(this, "${data.record._id}")'>Edit</button>
-                            <button class='delete-btn' onclick='deleteRecord("${data.record._id}")'>Delete</button>
-                        </td>
-                    `;
-                    table.appendChild(row);
-                }
-
-                if (data.action === "update") {
-                    const row = document.getElementById(data.record._id);
-                    if (row) {
-                        row.cells[1].innerHTML = `<span>${data.record.environment}</span>`;
-                        row.cells[2].innerHTML = `<span>${data.record.build}</span>`;
-                        row.cells[3].innerHTML = `<span>${data.record.developer}</span>`;
-                        row.cells[4].innerHTML = `<span>${data.record.qa}</span>`;
-                    }
-                }
-
-                if (data.action === "delete") {
-                    const row = document.getElementById(data.recordId);
-                    if (row) {
-                        row.remove();
-                    }
-                }
+        try {
+            await fetch(`/updateRecord/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData),
             });
+            fetchRecords(); // Refresh after edit
+        } catch (error) {
+            console.error("Error updating record:", error);
+        }
+    }
+}
 
-            window.onload = fetchRecords;
+// Delete a record
+async function deleteRecord(id) {
+    if (!confirm("Are you sure you want to delete this record?")) return;
+
+    try {
+        await fetch(`/deleteRecord/${id}`, { method: "DELETE" });
+        fetchRecords(); // Refresh after deletion
+    } catch (error) {
+        console.error("Error deleting record:", error);
+    }
+}
+
+// Real-time update listener
+socket.on("recordUpdated", () => {
+    console.log("🔄 Real-time update triggered.");
+    fetchRecords(); // Refresh entire UI on any change
+});
+
+// Initial load
+window.onload = fetchRecords;
+
         </script>
     </body>
 </html>
