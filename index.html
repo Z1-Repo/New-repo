@@ -5,6 +5,166 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Environment_Status</title>
         <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <style>
+            body {
+                font-family: Georgia, serif;
+                margin: 0;
+                padding: 0;
+                background-color: white;
+                transition: background-color 0.3s ease-in-out;
+            }
+
+            header {
+                background-color: #27989c;
+                color: white;
+                text-align: center;
+                padding: 15px;
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            main {
+                padding: 20px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+                max-width: 1200px; /* Prevents excessive expansion */
+                margin: 0 auto; /* Centers content */
+            }
+
+            .table-section {
+                background: #e7fcfb;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 1200px; /* Restricts table expansion */
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .table-section:hover {
+                transform: scale(1.02);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            table,
+            th,
+            td {
+                border: 1px solid #ddd;
+                
+            }
+
+            th,
+            td {
+                padding: 10px;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            th {
+                background: #74cccf;
+                color: white;
+            }
+
+            .actions button {
+                margin-right: 5px;
+                padding: 5px;
+                border: none;
+                cursor: pointer;
+                border-radius: 3px;
+                transition: background 0.3s;
+            }
+
+            .edit-btn {
+                background: orange;
+                color: white;
+            }
+
+            .edit-btn:hover {
+                background: darkorange;
+            }
+
+            .delete-btn {
+                background: crimson;
+                color: white;
+            }
+
+            .delete-btn:hover {
+                background: darkred;
+            }
+
+            /* Responsive Design */
+
+            /* Tablets (max-width: 1024px) */
+            @media (max-width: 1920px) {
+                .table-section {
+                    max-width: 80%;
+                }
+            }
+
+            /* Mobile Devices (max-width: 768px) */
+            @media (max-width: 768px) {
+                main {
+                    flex-direction: column; /* Stack tables on small screens */
+                    align-items: center;
+                    padding: 10px;
+                }
+
+                .table-section {
+                    width: 100%;
+                    max-width: 100%;
+                    padding: 15px;
+                }
+
+                th,
+                td {
+                    padding: 8px;
+                    font-size: 14px; /* Reduce text size for better fit */
+                }
+
+                .actions button {
+                    padding: 5px 8px;
+                    font-size: 12px; /* Smaller buttons for smaller screens */
+                }
+            }
+
+            /* Small Mobile Screens (max-width: 480px) */
+            @media (max-width: 480px) {
+                header {
+                    font-size: 20px; /* Reduce header size */
+                    padding: 10px;
+                }
+
+                th,
+                td {
+                    padding: 6px;
+                    font-size: 12px;
+                }
+
+                .actions button {
+                    padding: 4px 6px;
+                    font-size: 10px;
+                }
+
+                /* Enable horizontal scrolling for very small screens */
+                .table-section {
+                    overflow-x: auto;
+                }
+
+                table {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+            }
+        </style>
     </head>
 
     <body>
